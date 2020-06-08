@@ -1,0 +1,77 @@
+{% extends 'admins/base1.html' %}
+
+{% block content %}
+
+                <div class="content-page">
+                    <div class="content">
+
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box">
+                                    <div class="page-title-right">
+                                        <ol class="breadcrumb m-0">
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">首页</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">数据管理</a></li>
+                                            <li class="breadcrumb-item active">餐饮列表</li>
+                                        </ol>
+                                    </div>
+                                    <h4 class="page-title">餐饮列表</h4>
+                                </div> <!-- end page-title-box -->
+                            </div> <!-- end col-->
+                        </div>
+                        <!-- end page title -->
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <table id="basic-datatable" class="table dt-responsive nowrap" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>id</th>
+                                                    <th>餐品名称</th>
+                                                    <th>星</th>
+                                                    <th>钻</th>
+                                                    <th>冠</th>
+                                                    <th>餐品价格</th>
+                                                </tr>
+                                            </thead>
+                                        
+                                        
+                                            <tbody>
+                                                {% for i in data %}
+                                                <tr>
+                                                    <td>{{ i.id }}</td>
+                                                    <td>{{ i.name }}</td>
+                                                    <td>{{ i.star }}</td>
+                                                    <td>{{ i.drill }}</td>
+                                                    <td>{{ i.crown }}</td>
+                                                    <td>{{ i.price }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                
+                                            </tbody>
+                                        </table>
+
+                                    </div> <!-- end card body-->
+                                </div> <!-- end card -->
+                            </div><!-- end col-->
+                        </div>
+                        <!-- end row-->
+
+                    </div> <!-- content -->
+
+                </div> <!-- content-page -->
+
+            </div> <!-- end wrapper-->
+
+            <!-- ============================================================== -->
+            <!-- End Page content -->
+            <!-- ============================================================== -->
+
+
+        </div>
+        <!-- END Container -->
+
+{% endblock %}
