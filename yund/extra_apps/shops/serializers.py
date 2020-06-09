@@ -101,7 +101,6 @@ class Users_addressSerializer(serializers.ModelSerializer):
 
 #商品问答表
 class QaSerializer(serializers.ModelSerializer):
-    g_id = serializers.IntegerField(required=False)#商品id
     questions = serializers.CharField(max_length=255,required=False)#问题
     answers = serializers.CharField(max_length=255,required=False)#答案
 
@@ -114,6 +113,50 @@ class QaSerializer(serializers.ModelSerializer):
     class Meta:
         model = QA
         fields = '__all__'
+
+#商品属性分类
+class GadSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=255,required=False)#属性分类名称
+
+    def validate(self, attrs):
+        return attrs
+    
+    def create(self, validated_data):
+        return Goods_attribute_definition.objects.create(**validated_data)
+    class Meta:
+        model = Goods_attribute_definition
+        fields = '__all__'
+    
+#商品属性
+class GaSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=255,required=False)#属性分类名称
+    tid = serializers.IntegerField(default=0,required=False)
+
+    def validate(self, attrs):
+        return attrs
+    
+    def create(self, validated_data):
+        return Goods_attribute.objects.create(**validated_data)
+    class Meta:
+        model = Goods_attribute
+        fields = '__all__'
+
+            
+#商品规格
+class GnSerializer(serializers.ModelSerializer):
+    a_id = serializers.CharField(max_length=255,required=False)
+    price = serializers.DecimalField(max_digits=8, decimal_places=2,required=False)
+    stock = serializers.IntegerField(default=0,required=False)
+
+    def validate(self, attrs):
+        return attrs
+    
+    def create(self, validated_data):
+        return Goods_norms.objects.create(**validated_data)
+    class Meta:
+        model = Goods_norms
+        fields = '__all__'
+
 
 # 商品举报表
 class GreportsSerializer(serializers.ModelSerializer):
@@ -128,6 +171,21 @@ class GreportsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goods_report_content
+        fields = '__all__'
+
+# 收藏表
+class UcSerializer(serializers.ModelSerializer):
+    uid = serializers.IntegerField(required=False)
+    tid = serializers.IntegerField(required=False)
+    g_id = serializers.IntegerField(required=False)
+    def validate(self, attrs):
+        return attrs
+    
+    def create(self, validated_data):
+        return User_collection.objects.create(**validated_data)
+
+    class Meta:
+        model = User_collection
         fields = '__all__'
 
 

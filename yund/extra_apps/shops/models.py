@@ -71,6 +71,7 @@ class Goods(BaseModel,models.Model):
     s_details = models.CharField(max_length=255,verbose_name='详情')
     type = models.IntegerField(default=1,verbose_name='1个人入驻2企业入驻')
     is_del = models.IntegerField(default=0,verbose_name='0未删除1已删除')
+    tid = models.IntegerField(default=0,verbose_name='总分类id')
 
     class Meta: 
         db_table = "goods"
@@ -114,10 +115,10 @@ class Goods_comment_types(BaseModel,models.Model):
 class QA(BaseModel,models.Model):
     """商品问答表"""
     id = models.AutoField(primary_key=True)
-    g_id = models.IntegerField(default=0,verbose_name='商品id')
+    g_id = models.IntegerField(default=0,verbose_name='商品id',null=True, blank=True)
     questions = models.CharField(max_length=255,verbose_name='问题')
     answers = models.CharField(max_length=255,verbose_name='答案')
-    t_id = models.IntegerField(verbose_name='总分类id')
+    t_id = models.IntegerField(verbose_name='总分类id',null=True, blank=True,default=0)
 
     class Meta: 
         db_table = "qa"
@@ -139,7 +140,7 @@ class Goods_attribute(BaseModel,models.Model):
     """商品属性表"""
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30,verbose_name='属性名称')
-    type = models.IntegerField(verbose_name='属性分类id')
+    tid = models.IntegerField(verbose_name='属性分类id')
 
     class Meta:
         db_table = "goods_attribute"
@@ -147,7 +148,7 @@ class Goods_attribute(BaseModel,models.Model):
 class Goods_norms(BaseModel,models.Model):
     """商品规格表"""
     id = models.AutoField(primary_key=True)
-    g_id = models.IntegerField(verbose_name='商品id')
+    g_id = models.IntegerField(default=0,verbose_name='商品id',null=True, blank=True)
     a_id = models.CharField(max_length=255,verbose_name='属性id')
     price = models.DecimalField(max_digits=8, decimal_places=2,verbose_name='价格')
     stock = models.IntegerField(verbose_name='库存')
@@ -158,7 +159,7 @@ class Goods_norms(BaseModel,models.Model):
 class Goods_attribute_definition(BaseModel,models.Model):
     """商品属性分类表"""
     id = models.AutoField(primary_key=True)
-    g_id = models.IntegerField(verbose_name='商品id')
+    g_id = models.IntegerField(default=0,verbose_name='商品id',null=True, blank=True)
     name = models.CharField(max_length=255,verbose_name='属性分类名称')
 
     class Meta:

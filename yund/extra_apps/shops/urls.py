@@ -11,53 +11,50 @@ urlpatterns = [
     # # 位置定位
     # path('fixed_position',Fixed_position.as_view()),
 
-    # # 1-登陆
-    # path('login',Login.as_view()),
-    # # 3-注册
-    # path('register',Register.as_view()),
-    # # 第三方登陆url
-    # path('wqw_Login',Wqw_Login.as_view()),
-    # # 6-设置新密码
-    # path('upwd',Upwd.as_view()),
+    # 1-登陆
+    path('login',Login.as_view()),
+    # 3-注册
+    path('register',Register.as_view()),
+    # 第三方登陆url
+    path('wqw_Login',Wqw_Login.as_view()),
+    # 6-设置新密码
+    path('upwd',Upwd.as_view()),
 
-    # # 添加规格信息
-    # path('goodsnadd',Goodsnadd.as_view()),
-
-    # # 1-选择定位(用户地址信息)
-    # path('address_list',Address_list.as_view()),
-    # # 3-个人入驻(入驻分类信息)
-    # path('type_move',Type_move.as_view()),
-    # # 3-个人入驻(添加)
-    # path('add_move',Add_move.as_view()),
-    # # 4-企业入驻(添加)
-    # path('add_moves',Add_moves.as_view()),
+    # 1-选择定位(用户地址信息)
+    path('address_list',Address_list.as_view()),
+    # 3-个人入驻(入驻分类信息)
+    path('type_move',Type_move.as_view()),
+    # 3-个人入驻(添加)
+    path('add_move',Add_move.as_view()),
+    # 4-企业入驻(添加)
+    path('add_moves',Add_moves.as_view()),
     
-    # # 查看审核状态
-    # path('examines',Examines.as_view()),
-    # # app介绍
-    # path('recommend',Recommend.as_view()),
-    # # 公告信息
-    # path('announcements',Announcements.as_view()),
+    # 查看审核状态
+    path('examines',Examines.as_view()),
+    # app介绍
+    path('recommend',Recommend.as_view()),
+    # 公告信息
+    path('announcements',Announcements.as_view()),
 
-    # # 公告详情
-    # path('anouncementsinfo',Announcementsinfo.as_view()),
-    # # 条款信息
-    # path('clauseinfo',Clauseinfo.as_view()),
-    # # 帮助信息
-    # path('helplist',Helplist.as_view()),
-    # # 帮助详情
-    # path('helpinfo',Helpinfo.as_view()),
-    # # 添加反馈信息
-    # path('qfeedbackcreate',Qfeedbackcreate.as_view()),
+    # 公告详情
+    path('anouncementsinfo',Announcementsinfo.as_view()),
+    # 条款信息
+    path('clauseinfo',Clauseinfo.as_view()),
+    # 帮助信息
+    path('helplist',Helplist.as_view()),
+    # 帮助详情
+    path('helpinfo',Helpinfo.as_view()),
+    # 添加反馈信息
+    path('qfeedbackcreate',Qfeedbackcreate.as_view()),
 
-    # # 1-搜索
-    # path('searchs',Searchs.as_view()),
-    # # 1-搜索历史信息
-    # path('search_takeinfo',Search_takeinfo.as_view()),
-    # # 1-删除搜索历史
-    # path('search_takedelete',Search_takedelete.as_view()),
-    # # 1-搜索联想
-    # path('search_lenovo',Search_lenovo.as_view()),
+    # 1-搜索
+    path('searchs',Searchs.as_view()),
+    # 1-搜索历史信息
+    path('search_takeinfo',Search_takeinfo.as_view()),
+    # 1-删除搜索历史
+    path('search_takedelete',Search_takedelete.as_view()),
+    # 1-搜索联想
+    path('search_lenovo',Search_lenovo.as_view()),
 
     # 搜索-商品
     path('goods_info',Goods_info.as_view()),
@@ -68,6 +65,10 @@ urlpatterns = [
 
     # 1-首页-搜索-商品详情
     path('goods_details',Goods_details.as_view()),
+    # 1-首页-搜索-商品详情-收藏
+    path('goods_collection',Goods_collection.as_view()),
+    # 1-首页-搜索-商品详情-取消收藏
+    path('goods_collection_delete',Goods_collection_delete.as_view()),
     # 1-首页-搜索-商品详情(举报)
     path('goods_reports',Goods_reports.as_view()),
     # 1-首页-搜索-商品详情(规格数据)
@@ -109,23 +110,46 @@ urlpatterns = [
     path('goods_delete',Goods_delete.as_view()),
     # 7-前台管理-商品管理-商品添加修改
     path('goods_add',Goods_add.as_view()),
+    # 7-前台管理-商品管理-问答添加
+    path('goods_qa_add',Goods_qa_add.as_view()),
+    # 7-前台管理-商品管理-问答列表
+    path('goods_qa_info',Goods_qa_info.as_view()),
+    # 7-前台管理-商品管理-问答删除
+    path('goods_qa_delete',Goods_qa_delete.as_view()),
+    # 7-前台管理-商品管理-一级规格添加
+    path('goods_attribute_definition_add',Goods_attribute_definition_add.as_view()),
+    # 7-前台管理-商品管理-二级规格添加
+    path('goods_attribute_add',Goods_attribute_add.as_view()),
+    # 7-前台管理-商品管理-规格列表
+    path('goods_attribute_info',Goods_attribute_info.as_view()),
+    # 7-前台管理-商品管理-一级规格删除
+    path('goods_attribute_definition_delete',Goods_attribute_definition_delete.as_view()),
+    # 7-前台管理-商品管理-二级规格删除
+    path('goods_attribute_delete',Goods_attribute_delete.as_view()),
+    # 7-前台管理-商品管理-规格价格添加
+    path('goods_norms_add',Goods_norms_add.as_view()),
+    # 7-前台管理-商品管理-规格价格删除
+    path('goods_norms_delete',Goods_norms_delete.as_view()),
 
-    # # 7-前台-餐饮管理简介
-    # path('catering_info',Catering_info.as_view()),
-    # # 7-前台-餐饮管理-简介添加修改
-    # path('catering_info_add',Catering_info_add.as_view()),
-    # # 7-前台-餐饮管理-类别管理
-    # path('catering_type_info',Catering_type_info.as_view()),
-    # # 7-前台-餐饮管理-类别管理添加
-    # path('catering_type_add',Catering_type_add.as_view()),
-    # # 7-前台-餐饮管理-类别管理删除
-    # path('catering_type_delete',Catering_type_delete.as_view()),
-    # # 7-前台-餐饮管理
-    # path('catering_goods_info',Catering_goods_info.as_view()),
-    # # 7-前台-餐饮管理-餐饮删除
-    # path('catering_goods_delete',Catering_goods_delete.as_view()),
-    # # 7-前台-餐饮管理-餐品添加编辑
-    # path('catering_goods_add',Catering_goods_add.as_view()),
+
+
+
+    # 7-前台-餐饮管理简介
+    path('catering_info',Catering_info.as_view()),
+    # 7-前台-餐饮管理-简介添加修改
+    path('catering_info_add',Catering_info_add.as_view()),
+    # 7-前台-餐饮管理-类别管理
+    path('catering_type_info',Catering_type_info.as_view()),
+    # 7-前台-餐饮管理-类别管理添加
+    path('catering_type_add',Catering_type_add.as_view()),
+    # 7-前台-餐饮管理-类别管理删除
+    path('catering_type_delete',Catering_type_delete.as_view()),
+    # 7-前台-餐饮管理
+    path('catering_goods_info',Catering_goods_info.as_view()),
+    # 7-前台-餐饮管理-餐饮删除
+    path('catering_goods_delete',Catering_goods_delete.as_view()),
+    # 7-前台-餐饮管理-餐品添加编辑
+    path('catering_goods_add',Catering_goods_add.as_view()),
 
     
 
