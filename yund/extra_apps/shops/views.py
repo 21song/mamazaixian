@@ -1916,3 +1916,4 @@ class Catering_goods_add(APIView):
         return Response(mes)
 
 
+#qwe
