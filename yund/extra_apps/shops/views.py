@@ -1915,5 +1915,3 @@ class Catering_goods_add(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-
-#qwe
