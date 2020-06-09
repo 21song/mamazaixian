@@ -27,4 +27,5 @@ urlpatterns = [
     re_path('^upload/(?P<path>.*)$',serve,{'document_root':UPLOAD_ROOT}),
     path('',include('shops.urls')),
     path('admin/',include('mmadmin.urls')),
+    path('service/',include('service.urls',namespace='service')),
 ]
