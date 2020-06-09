@@ -172,21 +172,6 @@ class Register(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-class Goodsnadd(APIView):
-    """ 添加商品规格(no)
-    """
-    def get(self,request):
-        datas=request.GET
-        print('xinxi',datas)
-        # 获取属性id商品id  查询商品规格表 将属性id进行排序  与  规格表进行对比
-        return Response(datas)
-    
-    def post(self,request):
-        datas=request.POST.get('datas')
-        print(datas)
-
-        return Response(datas)
-
 class Upwd(APIView):
     """6-设置新密码
     {
@@ -244,8 +229,8 @@ class Type_move(APIView):
     """
     def get(self,request):
         mes={}
-        # assemble_t_list=Assemble_type.objects.all()
-        # assemble_tserializer=Assemble_typeModelSerializer(assemble_t_list,many=True)
+        assemble_t_list=Assemble_type.objects.all()
+        assemble_tserializer=Assemble_typeModelSerializer(assemble_t_list,many=True)
         mes['code']=200
         mes['data']=shop_tserializer.data
         return Response(mes)   
@@ -300,7 +285,8 @@ class Add_move(APIView):
                     user_id=uid,
                     name=cname,
                     pic=cpic,
-                    details=ccontent
+                    details=ccontent,
+                    t_id=t_id
                 ).save()
                 mes['code']=200
                 mes['data']="添加成功"
@@ -368,7 +354,8 @@ class Add_moves(APIView):
                     user_id=uid,
                     name=cname,
                     pic=cpic,
-                    details=ccontent
+                    details=ccontent,
+                    t_id=t_id
                 ).save()
 
                 num=ninthnum()
@@ -457,9 +444,8 @@ class Recommend(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 8-公告
 class Announcements(APIView):
-    """公告信息"""
+    """8-公告"""
     def get(self,request):
         mes={}
         try:
@@ -472,9 +458,8 @@ class Announcements(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 9-公告详情
 class Announcementsinfo(APIView):
-    """公告详情信息
+    """9-公告详情
     {
         id: 公告id
     }
@@ -494,9 +479,8 @@ class Announcementsinfo(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 10-条款
 class Clauseinfo(APIView):
-    """条款信息"""
+    """10-条款"""
     def get(self,request):
         mes={}
         try:
@@ -509,9 +493,8 @@ class Clauseinfo(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 11-帮助
 class Helplist(APIView):
-    """帮助"""
+    """11-帮助"""
     def get(self,request):
         mes={}
         try:
@@ -524,9 +507,8 @@ class Helplist(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 12-帮助详情
 class Helpinfo(APIView):
-    """帮助详情
+    """12-帮助详情
     {
         id: 帮助id
     }
@@ -545,9 +527,8 @@ class Helpinfo(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 13-问题反馈
 class Qfeedbackcreate(APIView):
-    """问题反馈
+    """13-问题反馈
     {
         name: 留言
         tep: 电话
@@ -570,9 +551,8 @@ class Qfeedbackcreate(APIView):
 # 14-主页-聊天(no)
 
 
-# 1-搜索
 class Searchs(APIView):
-    """搜索
+    """1-搜索
     {
         'uid':用户id
         'name': 搜索内容
@@ -600,9 +580,8 @@ class Searchs(APIView):
 
         return Response(mes)
 
-# 1-搜索历史信息
 class Search_takeinfo(APIView):
-    """搜索历史记录
+    """1-搜索历史信息
     {
         uid: 用户id
     }
@@ -623,9 +602,8 @@ class Search_takeinfo(APIView):
 
         return Response(mes)
 
-# 1-删除搜索历史
 class Search_takedelete(APIView):
-    """搜索历史清空
+    """1-搜索历史清空
     {
         uid: 用户id,
         sid: 记录id
@@ -655,7 +633,6 @@ class Search_takedelete(APIView):
 
         return Response(mes)
 
-# 2-搜素联想
 class Search_lenovo(APIView):
     """2-搜索联想
     {
@@ -673,6 +650,156 @@ class Search_lenovo(APIView):
             mes['code']=0
             mes['msg']='服务异常'    
         return Response(mes)
+
+
+class Userinfo(APIView):
+    """5-我的-设置-个人资料
+    {
+       'uid': 用户id 
+    }
+    """
+    def get(self,request):
+        mes={}
+        uid=request.GET.get("uid")
+        try:
+            userinfo=Users.objects.filter(id=uid)
+            userinfo_ser=UserinfoModelSerializer(userinfo,many=True)          
+            mes['code']=200
+            mes['data']=userinfo_ser.data
+        except:
+            mes['code']=0
+            mes['msg']='服务异常'
+
+        return Response(mes)
+
+class Users_address_info(APIView):
+    """5-我的-设置-管理收货地址
+    {
+       'uid': 用户id 
+    }
+    """
+    def get(self,request):
+        mes={}
+        uid=request.GET.get('uid')
+        try:
+            ua_data=Users_address.objects.filter(user_id=uid)
+            ua_ser=Users_addressModelSerializer(ua_data,many=True)          
+            mes['code']=200
+            mes['data']=ua_ser.data
+        except:
+            mes['code']=0
+            mes['msg']='服务异常'
+
+        return Response(mes)
+
+class Users_address_add(APIView):
+    """5-我的-设置-地址添加修改
+    {
+        'user_id':用户id,
+        'name':收货人姓名,
+        'tep':电话,
+        'address':收货地址,
+        'details':详细地址,
+        'type':是否默认0否1是,
+        'id':地址id有为编辑,无为新增
+    }
+    """
+    def post(self,request):
+        mes={}
+        request_data=request.data
+        aid=request_data.get('id')
+        try:
+            if aid:
+                try:
+                    Users_address.objects.filter(id=aid).update(
+                        user_id=request_data.get('user_id'),
+                        name=request_data.get('name'),
+                        tep=request_data.get('tep'),
+                        address=request_data.get('address'),
+                        details=request_data.get('details'),
+                        type=request_data.get('type')
+                    )
+                    mes['code']=200
+                    mes['msg']='修改成功'
+                except:
+                    mes['code']=0
+                    mes['msg']='修改异常'
+            else:
+                ua_ser=Users_addressSerializer(data=request_data)
+                if ua_ser.is_valid():
+                    user_obj=ua_ser.save()
+                    mes['code']=200
+                    mes['msg']='成功'
+                else:
+                    mes['code']=1
+                    mes['msg']=ua_ser.errors
+        except:
+            mes['code']=0
+            mes['msg']='修改异常'
+        return Response(mes)
+
+class Users_address_delete(APIView):
+    """5-我的-设置-收货地址-删除
+    {
+        'aid':地址id
+    }
+    """
+    def post(self,request):
+        mes={}
+        aid=request.POST.get('aid')
+        try:
+            Users_address.objects.filter(id=aid).delete()
+            mes['code']=200
+            mes['data']='成功'
+        except:
+            mes['code']=1
+            mes['msg']='服务异常'
+        return Response(mes)
+
+class Users_address_type(APIView):
+    """5-我的-设置-设为默认地址
+    {
+        'aid':地址id,
+        'user_id':用户id
+    }
+    """
+    def post(self,request):
+        mes={}
+        aid=request.POST.get('aid')
+        user_id=request.POST.get('user_id')
+        try:
+            Users_address.objects.filter(type=1,user_id=user_id).update(type=0)
+            Users_address.objects.filter(id=aid).update(type=1)
+            mes['code']=200
+            mes['data']='成功'
+        except:
+            mes['code']=1
+            mes['msg']='服务异常'
+        return Response(mes)
+
+class User_utep(APIView):
+    """我的-设置-修改手机号
+    {
+        'user_id':用户id,
+        'tep':手机号
+    }
+    """
+    def post(self,request):
+        mes={}
+        request_data=request.data
+        user_id=request_data.get('user_id')
+        tep=request_data.get('tep')
+        try:
+            Users.objects.filter(_id=user_id).update(tep=tep)
+            mes['code']=200
+            mes['data']='成功'
+        except:
+            mes['code']=1
+            mes['msg']='服务异常'
+        return Response(mes)
+
+
+# 我的-设置-修改支付密码(no)
 
 
 class Goods_info(APIView):
@@ -731,8 +858,8 @@ class Goods_list(APIView):
         mes['data']=goods_datas
         return Response(mes)
 
-class Goods_sort(APIView):
-    """搜索-商品/级别排序(no)
+class Goods_sort(APIView):# 距离排序(no)
+    """搜索-商品/级别排序.
     {
         'name':名称,
         'star':星,
@@ -767,185 +894,33 @@ class Goods_sort(APIView):
         return Response(mes)
 
 
-# 5-我的-设置-个人资料
-class Userinfo(APIView):
-    """5-我的-设置-个人资料get
-    {
-       'uid': 用户id 
-    }
-    """
-    def get(self,request):
-        mes={}
-        uid=request.GET.get("uid")
-        try:
-            userinfo=Users.objects.filter(id=uid)
-            userinfo_ser=UserinfoModelSerializer(userinfo,many=True)          
-            mes['code']=200
-            mes['data']=userinfo_ser.data
-        except:
-            mes['code']=0
-            mes['msg']='服务异常'
 
-        return Response(mes)
-
-# 5-我的-设置-管理收货地址
-class Users_address_info(APIView):
-    """5-我的-设置-管理收货地址get
-    {
-       'uid': 用户id 
-    }
-    """
-    def get(self,request):
-        mes={}
-        uid=request.GET.get('uid')
-        try:
-            ua_data=Users_address.objects.filter(user_id=uid)
-            ua_ser=Users_addressModelSerializer(ua_data,many=True)          
-            mes['code']=200
-            mes['data']=ua_ser.data
-        except:
-            mes['code']=0
-            mes['msg']='服务异常'
-
-        return Response(mes)
-
-# 5-我的-设置-地址添加修改
-class Users_address_add(APIView):
-    """5-我的-设置-添加地址
-    {
-        'user_id':用户id,
-        'name':收货人姓名,
-        'tep':电话,
-        'address':收货地址,
-        'details':详细地址,
-        'type':是否默认0否1是,
-        'id':地址id有为编辑,无为新增
-    }
-    """
-    def post(self,request):
-        mes={}
-        request_data=request.data
-        aid=request_data.get('id')
-        try:
-            if aid:
-                try:
-                    Users_address.objects.filter(id=aid).update(
-                        user_id=request_data.get('user_id'),
-                        name=request_data.get('name'),
-                        tep=request_data.get('tep'),
-                        address=request_data.get('address'),
-                        details=request_data.get('details'),
-                        type=request_data.get('type')
-                    )
-                    mes['code']=200
-                    mes['msg']='修改成功'
-                except:
-                    mes['code']=0
-                    mes['msg']='修改异常'
-            else:
-                ua_ser=Users_addressSerializer(data=request_data)
-                if ua_ser.is_valid():
-                    user_obj=ua_ser.save()
-                    mes['code']=200
-                    mes['msg']='成功'
-                else:
-                    mes['code']=1
-                    mes['msg']=ua_ser.errors
-        except:
-            mes['code']=0
-            mes['msg']='修改异常'
-        return Response(mes)
-
-# 5-我的-设置-收货地址-删除
-class Users_address_delete(APIView):
-    """5-我的-设置-收货地址-删除
-    {
-        'aid':地址id
-    }
-    """
-    def post(self,request):
-        mes={}
-        aid=request.POST.get('aid')
-        try:
-            Users_address.objects.filter(id=aid).delete()
-            mes['code']=200
-            mes['data']='成功'
-        except:
-            mes['code']=1
-            mes['msg']='服务异常'
-        return Response(mes)
-
-# 5-我的-设置-设为默认地址
-class Users_address_type(APIView):
-    """5-我的-设置-设为默认地址
-    {
-        'aid':地址id,
-        'user_id':用户id
-    }
-    """
-    def post(self,request):
-        mes={}
-        aid=request.POST.get('aid')
-        user_id=request.POST.get('user_id')
-        try:
-            Users_address.objects.filter(type=1,user_id=user_id).update(type=0)
-            Users_address.objects.filter(id=aid).update(type=1)
-            mes['code']=200
-            mes['data']='成功'
-        except:
-            mes['code']=1
-            mes['msg']='服务异常'
-        return Response(mes)
-
-# 我的-设置-修改手机号
-class User_utep(APIView):
-    """修改手机号
-    {
-        'user_id':用户id,
-        'tep':手机号
-    }
-    """
-    def post(self,request):
-        mes={}
-        request_data=request.data
-        user_id=request_data.get('user_id')
-        tep=request_data.get('tep')
-        try:
-            Users.objects.filter(_id=user_id).update(tep=tep)
-            mes['code']=200
-            mes['data']='成功'
-        except:
-            mes['code']=1
-            mes['msg']='服务异常'
-        return Response(mes)
-
-# 我的-设置-修改支付密码(no)
-
-
-
-
-
-
-# 1-首页-搜索-商品详情
 class Goods_details(APIView):
     """1-首页-搜索-商品详情
     {
         'g_id':商品id,
-        't_id':商品分类id,
         'u_id':用户id
+    }return:
+    {
+        'goods':当前商品信息,
+        'is_collection':是否收藏,
+        'comment':商品评价,
+        'qa':问答,
+        'recommend':推荐商品信息,
+        'company':公司信息
     }
     """
     def get(self,request):
         mes={}
         gid=request.GET.get('g_id')
-        tid=request.GET.get('t_id')
         uid=request.GET.get('u_id')
         try:
             g_list=Goods.objects.filter(id=gid)
             g_serializer=GoodsModelSerializer(g_list,many=True)
 
+            co_data=Company.objects.filter(id=g_list[0].company_id).first()
             is_collection='未收藏'
-            uc_data=User_collection.objects.filter(uid=uid,tid=tid,g_id=gid)
+            uc_data=User_collection.objects.filter(uid=uid,tid=co_data.t_id,g_id=gid)
             if uc_data:
                 is_collection='收藏'
             
@@ -968,7 +943,7 @@ class Goods_details(APIView):
                     qa_dict['answers']=qa[0]['answers']
                     qa_list.append(qa_dict)
             else:
-                pass
+                mes['msg']='无问答信息'
 
             c_id=Goods.objects.filter(id=gid).values('company_id')
             s_t_list=Goods.objects.filter(Q(company_id=c_id[0]['company_id']),Q(is_del=0)).order_by('-sales_volume')[:3]
@@ -992,7 +967,52 @@ class Goods_details(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 1-首页-搜索-商品详情(举报)
+class Goods_collection(APIView):
+    """1-首页-搜索-商品详情-收藏
+    {
+        'uid':用户id,
+        'tid':总分类id,
+        'g_id':商品id
+    }
+    """
+    def post(self,request):
+        mes={}
+        try:
+            request_data=request.data
+            uc_ser=UcSerializer(data=request_data)
+            if uc_ser.is_valid():
+                user_obj=uc_ser.save()
+                mes['code']=200
+                mes['msg']="成功"
+            else:
+                mes['code']=1
+                mes['msg']=uc_ser.errors
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+        return Response(mes)
+
+class Goods_collection_delete(APIView):
+    """1-首页-搜索-商品详情-取消收藏
+    {
+        'uid':用户id,
+        'g_id':商品id
+    }
+    """
+    def post(self,request):
+        mes={}
+        try:
+            request_data=request.data
+            uid=request_data.get('uid')
+            g_id=request_data.get('g_id')
+            User_collection.objects.filter(uid=uid,g_id=g_id).delete()
+            mes['code']=200
+            mes['msg']="成功"
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+        return Response(mes)
+
 class Goods_reports(APIView):
     """1-首页-搜索-商品详情(举报)
     {
@@ -1015,7 +1035,6 @@ class Goods_reports(APIView):
 
         return Response(mes)
 
-# 1-首页-搜索-商品详情(规格数据)
 class Goods_norms_data(APIView):
     """1-首页-搜索-商品详情(规格数据)
     {'g_id':商品id}
@@ -1249,10 +1268,6 @@ class Submit_order_info(APIView):
 
         return Response(mes)
 
-
-
-
-
 class Goods_infos(APIView):
     """7-前台管理-商品管理
     {'uid':用户id}
@@ -1304,20 +1319,20 @@ class Goods_delete(APIView):
             mes['msg']='服务异常'
         return Response(mes)
 
-# 7-商品预览(no)
+# 7-商品预览(no)商品详情页
 
-# (qa与规格未添加)(no))
 class Goods_add(APIView):
     """7-前台管理-商品管理-添加修改商品
     {'name': 标题,
     'pics': 图片,
-    'price': 价格,
+    'normsid':一级规格id,
+    'norms_priceid':规格价格id,
+    'qaid': 问答id,
     'prices': 运费,
     'sales_volume':销量,
     'old_new':新旧(旧0新1),
     'brand':品牌(0否1是),
     'place':发货地,
-    'qa':商品问答,
     's_details':详情,   
     'user_id':用户id,
     'type':1个人入驻2企业入驻,
@@ -1328,78 +1343,321 @@ class Goods_add(APIView):
         request_data=request.data
         gid=request_data.get('id')
         user_id=request_data.get('user_id')
-        qa=request_data.get('qa')
+        normsid=request_data.get('normsid')
+        if len(normsid) != 1:
+            normsid=normsid.split(',')
+        else:
+            normsid=[normsid]
+        norms_priceid=request_data.get('norms_priceid')
+        if len(norms_priceid) != 1:
+            norms_priceid=norms_priceid.split(',')
+        else:
+            norms_priceid=[norms_priceid]
+        qaid=request_data.get('qaid')
+        if len(qaid) != 1:
+            qaid=qaid.split(',')
+        else:
+            qaid=[qaid]
         place=request_data.get('place')
         place=place.split(',')
-        drill,crown=0,0
-        # try:
-        c_data=Company.objects.filter(user_id=user_id)
-        if int(request_data.get('type')) == 1:
-            drill=Move_into.objects.filter(user_id=user_id).values('drill')[0]['drill']
-            crown=Move_into.objects.filter(user_id=user_id).values('crown')[0]['crown']
-        elif int(request_data.get('type')) == 2:
-            drill=Move_intos.objects.filter(user_id=user_id).values('drill')[0]['drill']
-            crown=Move_intos.objects.filter(user_id=user_id).values('crown')[0]['crown']
-        else:
-            mes['code']=0
-            mes['msg']='type参数没有'
-        pdict={'province':place[0],'city':place[1],'county':place[2],'drill':drill,'crown':crown,'company_id':c_data[0].id}
-
-        for i in request_data:
-            rdict={}
-            if type(request_data[i]) == str:
-                rdict[i]=request_data[i]
+        drill,crown,tid=0,0,0
+        try:
+            c_data=Company.objects.filter(user_id=user_id)
+            if int(request_data.get('type')) == 1:
+                drill=Move_into.objects.filter(user_id=user_id).values('drill')[0]['drill']
+                crown=Move_into.objects.filter(user_id=user_id).values('crown')[0]['crown']
+                tid=Move_into.objects.filter(user_id=user_id).values('t_id')[0]['t_id']
+            elif int(request_data.get('type')) == 2:
+                drill=Move_intos.objects.filter(user_id=user_id).values('drill')[0]['drill']
+                crown=Move_intos.objects.filter(user_id=user_id).values('crown')[0]['crown']
+                tid=Move_intos.objects.filter(user_id=user_id).values('t_id')[0]['t_id']
             else:
-                rdict[i]=request_data[i][0]
-            request_data=dict(request_data,**rdict)
-        request_data=dict(request_data,**pdict)
-        if gid:
-            try:
-                Goods.objects.filter(id=gid).update(
-                    name=request_data.get('name'),
-                    pics=request_data.get('pics'),
-                    price=request_data.get('price'),
-                    prices=request_data.get('prices'),
-                    sales_volume=request_data.get('sales_volume'),
-                    old_new=request_data.get('old_new'),
-                    brand=request_data.get('brand'),
-                    s_details=request_data.get('s_details'),
-                    user_id=request_data.get('user_id'),
-                    type=request_data.get('type'),
-                    province=place[0],
-                    city=place[1],
-                    county=place[2]
-                )
-                mes['code']=200
-                mes['msg']='成功'
-            except:
                 mes['code']=0
-                mes['msg']='服务修改异常'
-        else:
-            goods_ser=GoodsSerializer(data=request_data)
-            if goods_ser.is_valid():
-                user_obj=goods_ser.save()
-                # qadict={}
-                # for i in qa:
-                #     print(i)
-                #     qadict=dict(dict,**{'questions':i[0],'answers':i[1]})
-                # qa_data=dict(qadict,**{'g_id':user_obj.id})
-                # print(qa_data)
-                # qa_ser=QaSerializer(data=qa_data)
-                # if qa_ser.is_valid():
-                #     qa_obj=qa_ser.save()
-                # else:
-                #     mes['code']=1
-                #     mes['msg']=goods_ser.errors
+                mes['msg']='type参数没有'
+            pdict={'province':place[0],'city':place[1],'county':place[2],'drill':drill,'crown':crown,'company_id':c_data[0].id,'tid':tid}
+            for i in request_data:
+                rdict={}
+                if type(request_data[i]) == str:
+                    rdict[i]=request_data[i]
+                else:
+                    rdict[i]=request_data[i][0]
+                request_data=dict(request_data,**rdict)
+            request_data=dict(request_data,**pdict)
+            if gid:
+                try:
+                    Goods.objects.filter(id=gid).update(
+                        name=request_data.get('name'),
+                        pics=request_data.get('pics'),
+                        price=request_data.get('price'),
+                        prices=request_data.get('prices'),
+                        sales_volume=request_data.get('sales_volume'),
+                        old_new=request_data.get('old_new'),
+                        brand=request_data.get('brand'),
+                        s_details=request_data.get('s_details'),
+                        user_id=request_data.get('user_id'),
+                        type=request_data.get('type'),
+                        province=place[0],
+                        city=place[1],
+                        county=place[2]
+                    )
+                    mes['code']=200
+                    mes['msg']='成功'
+                except:
+                    mes['code']=0
+                    mes['msg']='服务修改异常'
+            else:
+                goods_ser=GoodsSerializer(data=request_data)
+                if goods_ser.is_valid():
+                    user_obj=goods_ser.save()
+                    for i in normsid:
+                        Goods_attribute_definition.objects.filter(id=i).update(g_id=user_obj.id)
+                    for i in norms_priceid:
+                        Goods_norms.objects.filter(id=i).update(g_id=user_obj.id)
+                    for i in qaid:
+                        QA.objects.filter(id=i).update(g_id=user_obj.id)
+                    mes['code']=200
+                    mes['msg']='成功'
+                else:
+                    mes['code']=1
+                    mes['msg']=goods_ser.errors 
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+        return Response(mes)
+
+class Goods_qa_add(APIView):
+    """7-前台管理-商品管理-问答添加
+    {
+        'questions':问题,
+        'answers':答案
+    }
+    """
+    def post(self,request):
+        mes={}
+        try:
+            request_data=request.data
+            goodsqa_ser=QaSerializer(data=request_data)
+            if goodsqa_ser.is_valid():
+                user_obj=goodsqa_ser.save()
                 mes['code']=200
-                mes['msg']='成功'
+                mes['msg']=user_obj.id
             else:
                 mes['code']=1
-                mes['msg']=goods_ser.errors 
-        # except:
-        #     mes['code']=0
-        #     mes['msg']="服务异常"
+                mes['msg']=goodsqa_ser.errors 
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
         return Response(mes)
+
+class Goods_qa_info(APIView):
+    """7-前台管理-商品管理-问答列表
+    {
+        'qaid':问答id
+    }
+    """
+    def get(self,request):
+        mes={}
+        try:
+            qaid=request.GET.get('qaid')
+            if len(qaid) != 1:
+                qaid=qaid.split(',')
+            else:
+                qaid=[qaid]
+            qa_data=[]
+            for i in qaid:
+                qa_da=QA.objects.filter(id=i)
+                qa_ser=QaSerializer(qa_da,many=True)
+                qa_data.append(qa_ser.data)
+            mes['code']=200
+            mes['data']=qa_data
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+        return Response(mes)
+
+class Goods_qa_delete(APIView):
+    """7-前台管理-商品管理-问答删除
+    {
+        'qid':问答id
+    }
+    """
+    def post(self,request):
+        mes={}  
+        qid=request.POST.get('qid')
+        try:
+            QA.objects.filter(id=qid).delete()
+            mes['code']=200
+            mes['data']='成功'
+        except:
+            mes['code']=0
+            mes['msg']='服务异常'
+        return Response(mes)
+
+class Goods_attribute_definition_add(APIView):
+    """7-前台管理-商品管理-一级规格添加
+    {
+        'name':名称
+    }
+    """
+    def post(self,request):
+        mes={}
+        try:
+            request_data=request.data
+            gad_ser=GadSerializer(data=request_data)
+            if gad_ser.is_valid():
+                user_obj=gad_ser.save()
+                mes['code']=200
+                mes['data']=user_obj.id
+            else:
+                mes['code']=1
+                mes['msg']=gad_ser.errors 
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+        return Response(mes)
+
+class Goods_attribute_add(APIView):
+    """7-前台管理-商品管理-二级规格添加
+    {   
+        'tid':一级规格id,
+        'name':名称
+    }
+    """
+    def post(self,request):
+        mes={}
+        try:
+            request_data=request.data
+            gad_ser=GaSerializer(data=request_data)
+            if gad_ser.is_valid():
+                user_obj=gad_ser.save()
+                mes['code']=200
+                mes['data']='OK'
+            else:
+                mes['code']=1
+                mes['msg']=gad_ser.errors 
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+        return Response(mes)
+
+class Goods_attribute_info(APIView):    
+    """7-前台管理-商品管理-规格列表
+    {
+        'tid':一级规格id
+    }
+    """
+    def get(self,request):
+        mes={}
+        try:
+            tid=request.GET.get('tid')
+            if not tid:
+                return Response({'mes':'tid呢?'})
+            if len(tid) != 1:
+                tid=tid.split(',')
+            else:
+                tid=[tid]
+            tidlist=[]
+            for i in tid:
+                gad_da=Goods_attribute_definition.objects.filter(id=i).values('id','name','g_id')
+                if not gad_da:
+                    return Response({'code':200,'mes':'暂无数据'})
+                gad_ser=GadSerializer(gad_da,many=True)
+                gad_data=gad_ser.data
+                ga_da=Goods_attribute.objects.filter(tid=i).values('id','name','tid')
+                ga_ser=GaSerializer(ga_da,many=True)
+                gad_data[0]['list']=ga_ser.data
+
+                tidlist.append(gad_data)
+            mes['code']=200
+            mes['data']=tidlist
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+        return Response(mes)
+
+class Goods_attribute_definition_delete(APIView):
+    """7-前台管理-商品管理-一级规格删除
+    {
+        'tid':一级规格id
+    }
+    """
+    def post(self,request):
+        mes={}  
+        tid=request.POST.get('tid')
+        try:
+            Goods_attribute_definition.objects.filter(id=tid).delete()
+            Goods_attribute.objects.filter(tid=tid).delete()
+            mes['code']=200
+            mes['data']='成功'
+        except:
+            mes['code']=0
+            mes['msg']='服务异常'
+        return Response(mes)
+
+class Goods_attribute_delete(APIView):
+    """7-前台管理-商品管理-二级规格删除
+    {
+        'tid':二级规格id
+    }
+    """
+    def post(self,request):
+        mes={}  
+        tid=request.POST.get('tid')
+        try:
+            Goods_attribute.objects.filter(id=tid).delete()
+            mes['code']=200
+            mes['data']='成功'
+        except:
+            mes['code']=0
+            mes['msg']='服务异常'
+        return Response(mes)
+
+class Goods_norms_add(APIView):
+    """7-前台管理-商品管理-规格价格添加
+    {
+        'a_id':二级规格id,
+        'price':价格,
+        'stock':库存
+    }
+    """
+    def post(self,request):
+        mes={}
+        try:
+            request_data=request.data
+            gn_ser=GnSerializer(data=request_data)
+            if gn_ser.is_valid():
+                user_obj=gn_ser.save()
+                mes['code']=200
+                mes['data']=user_obj.id
+            else:
+                mes['code']=1
+                mes['msg']=gn_ser.errors 
+        except:
+            mes['code']=0
+            mes['msg']="服务异常"
+
+        return Response(mes)
+
+class Goods_norms_delete(APIView):
+    """7-前台管理-商品管理-规格价格删除
+    {
+        'nid':id(规格价格)
+    }
+    """
+    def post(self,request):
+        mes={}  
+        nid=request.POST.get('nid')
+        try:
+            Goods_norms.objects.filter(id=nid).delete()
+            mes['code']=200
+            mes['data']='成功'
+        except:
+            mes['code']=0
+            mes['msg']='服务异常'
+        return Response(mes)
+
+
+
 
 class Catering_info(APIView):
     """7-前台-餐饮简介
@@ -1412,7 +1670,7 @@ class Catering_info(APIView):
         mes={}
         uid=request.GET.get('uid')
         type=request.GET.get('type')
-        try:
+        try: 
             c_data=Catering_shop.objects.filter(uid=uid,type=type)
             if c_data:
                 c_ser=Catering_shopModelSerializers(c_data,many=True)
@@ -1656,5 +1914,4 @@ class Catering_goods_add(APIView):
             mes['code']=1
             mes['msg']='服务异常'
         return Response(mes)
-
 

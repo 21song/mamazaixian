@@ -87,6 +87,7 @@ def get_token(payload,timeout):
 
 
 def tags(request_data):
+    """商品标签"""
     for i in range(len(request_data)):
         taglist=[]
         taglist.append('公司')

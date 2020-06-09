@@ -31,7 +31,7 @@ DEBUG = True
 
 # DEBUG = False
 # ALLOWED_HOSTS = ['*'] 
-ALLOWED_HOSTS = ['47.95.207.67','localhost','0.0.0.0:8000','127.0.0.1']
+ALLOWED_HOSTS = ['182.92.65.104','localhost','0.0.0.0:8000','127.0.0.1']
 
 SECRET_KEY='asdfsdafsfsajlfksdlkfslsfs'
 
@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shops',
     'rest_framework',
-    'crispy_forms',
     'mmadmin',
     'home',
     'service',   # 服务app
@@ -94,30 +93,20 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 # 线上数据库
-# DATABASES = {
-#    'default': {
-#           'ENGINE': 'django.db.backends.mysql', #数据库引擎
-#           'NAME': 'mama_kaifa_zgydg',                       #数据库名
-#           'USER': 'mama_kaifa_zgydg',                       #用户名
-#           'PASSWORD': 'SP2xfaTwfACEy4mK',                   #密码
-#           'HOST': '47.113.194.115',                           #数据库主机，默认为localhost
-#           'PORT': '',                           #数据库端口，MySQL默认为3306
-#           'OPTIONS': {
-#              'autocommit': True,
-#          }
-#     }
-# }
-
-# 本地数据库
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mama_kaifa',    # 你的数据库名称
-        'USER': 'root',   #你的数据库用户名
-        'PASSWORD': '', #你的数据库密码
-        'HOST': 'localhost', #你的数据库主机，留空默认为localhost
-        'PORT': '3306', #你的数据库端口
-    }}
+   'default': {
+          'ENGINE': 'django.db.backends.mysql', #数据库引擎
+          'NAME': 'mama_kaifa_zgydg',                       #数据库名
+          'USER': 'mama_kaifa_zgydg',                       #用户名
+          'PASSWORD': 'SP2xfaTwfACEy4mK',                   #密码
+          'HOST': '47.113.194.115',                           #数据库主机，默认为localhost
+          'PORT': '',                           #数据库端口，MySQL默认为3306
+          'OPTIONS': {
+             'autocommit': True,
+         }
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
