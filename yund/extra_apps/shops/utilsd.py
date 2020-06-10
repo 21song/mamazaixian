@@ -76,6 +76,7 @@ def send_sms1(*args):
 def sends(tep):
     """发短信"""
     str=sixnum(4)
+
     text="您的验证码是："+str+"。请不要把验证码泄露给其他人。"
     ret=send_sms1(text, tep)
     return str
@@ -146,3 +147,46 @@ def splits(data):
     else:
         data = [data]
     return data
+
+def cached(*args):
+    tep,time,str=args
+    userdics={
+        tep:{
+            'str':str,
+            'time':time
+        }
+    }
+    return userdics
+
+def str2sec(x):
+    '''
+    字符串时分秒转换成秒
+    '''
+    h, m, s = x.strip().split(':') #.split()函数将其通过':'分隔开，.strip()函数用来除去空格
+    return int(h)*3600 + int(m)*60 + int(s) #int()函数转换成整数运算
+
+def isstr(*args):
+    mes={}
+    strs,tep,str1=args
+    strs=eval(strs)
+    times=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    times=datetime.datetime.strptime(times,'%Y-%m-%d %H:%M:%S')
+    time=datetime.datetime.strptime(strs[tep]['time'],'%Y-%m-%d %H:%M:%S')
+    a =str(times-time)
+    nums = str2sec(a)
+    if nums > 60:
+        mes={
+            'code':0,
+            'msg':'验证码失效'
+        }
+    elif str1 != strs[tep]['str']:
+        mes={
+            'code':0,
+            'msg':'验证码错误'
+        }
+    else:
+        mes={
+            'code':'200',
+            'msg':'正确'
+        }
+    return mes

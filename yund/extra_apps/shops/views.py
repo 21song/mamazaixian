@@ -85,25 +85,31 @@ class Send_s(APIView):
         tep: 电话号码
     }return
     {
-        'str':验证码
+        'data':验证码信息
     }
     """
     def post(self, request):
         mes = {}
         tep = request.POST.get('tep')
         str = sends(tep)
+        time=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time)
+        str_status=cached(tep,time,str)
+        print(str_status)
         mes['code'] = "200"
-        mes['str'] = str
-        mes['data'] = "发送成功"
+        mes['data'] = str_status
+        mes['msg'] = "发送成功"
         return Response(mes)
 
 
 class Login(APIView):
     """1-登陆
     {
-        tep:电话号码,
-        name:mm账号,
-        password:密码
+        'tep':电话号码,
+        'name':mm账号,
+        'password':密码,
+        'str': 验证码,
+        'strdata': 初始验证码信息
     }
     """
     authentication_classes = []
@@ -113,48 +119,66 @@ class Login(APIView):
         name = request.POST.get('name')
         pwd = request.POST.get('password')
         tep = request.POST.get('tep')
-        try:
-            if tep:
-                user_tep = Users.objects.filter(tep=tep).first()
-                if user_tep:
-                    str = sends(tep)
+        str1 = request.POST.get('str')
+        strdata = request.POST.get('strdata')
+        # try:
+        if tep:
+            user_tep = Users.objects.filter(tep=tep).first()
+            if user_tep:
+                sa=isstr(strdata,tep,str1)
+                if sa['code'] == "200":
+                    payload = {
+                        "id": user_tep.id,
+                        "name": user_tep.name,
+                    }
+                    token = get_token(payload, 5)
                     mes['code'] = "200"
-                    mes['data'] = str
+                    mes['data'] = {
+                        'user_id':user_tep.id,
+                        'token':token
+                    }
                 else:
-                    mes['code'] = "1"
-                    mes['data'] = "该手机号未注册"
-            elif name:
-                user_obj = Users.objects.filter(mmh=name).first()
-                if pwd:
-                    pwd_v = check_password(pwd, user_obj.password)
-                    if pwd_v == True:
-                        payload = {
-                            "id": user_obj.id,
-                            "name": user_obj.name,
-                        }
-                        token = get_token(payload, 5)
-                        mes['code'] = "200"
-                        mes['data'] = token
-                    else:
-                        mes['code'] = "1"
-                        mes['data'] = "密码错误"
-                else:
-                    mes['code'] = "1"
-                    mes['data'] = "密码不能为空"
+                    return Response(sa)
             else:
                 mes['code'] = "1"
-                mes['data'] = "不能为空"
-        except:
-            mes['code'] = 0
-            mes['msg'] = '服务异常'
+                mes['msg'] = "该手机号未注册"
+        elif name:
+            user_obj = Users.objects.filter(mmh=name).first()
+            if pwd:
+                pwd_v = check_password(pwd, user_obj.password)
+                if pwd_v == True:
+                    payload = {
+                        "id": user_obj.id,
+                        "name": user_obj.name,
+                    }
+                    token = get_token(payload, 5)
+                    mes['code'] = "200"
+                    mes['data'] = {
+                        'user_id':user_obj.id,
+                        'token':token
+                    }
+                else:
+                    mes['code'] = "1"
+                    mes['msg'] = "密码错误"
+            else:
+                mes['code'] = "1"
+                mes['msg'] = "密码不能为空"
+        else:
+            mes['code'] = "1"
+            mes['msg'] = "不能为空"
+        # except:
+        #     mes['code'] = 0
+        #     mes['msg'] = '服务异常'
         return Response(mes)
 
 
 class Register(APIView):
     """3-注册
     {
-        tep: 电话号,
-        pwd: 密码
+        'tep': 电话号,
+        'pwd': 密码,
+        'str': 验证码,
+        'strdata': 初始验证码信息
     }
     """
     authentication_classes = []
@@ -163,28 +187,41 @@ class Register(APIView):
         mes = {}
         tep = request.POST.get('tep')
         pwd = request.POST.get('pwd')
+        strs = request.POST.get('strdata')
+        str1 = request.POST.get('str')
         try:
             if tep and pwd:
-                user_tep = Users.objects.filter(tep=tep).first()
-                if user_tep:
-                    mes['code'] = "1"
-                    mes['data'] = "用户已存在"
+                sa=isstr(strs,tep,str1)
+                if sa['code'] == "200":
+                    user_tep = Users.objects.filter(tep=tep).first()
+                    if user_tep:
+                        mes['code'] = "1"
+                        mes['msg'] = "用户已存在"
+                    else:
+                        pwd = make_password(pwd,None, 'pbkdf2_sha256')
+                        num = ninthnum()
+                        Users.objects.create(tep=tep,
+                                            password=pwd,
+                                            mmh=num,
+                                            name=tep).save()
+                        user = Users.objects.filter(mmh=num).values('id','name')
+                        payload = {
+                            "id": user[0]['id'],
+                            "name": user[0]['name']
+                        }
+                        token = get_token(payload, 5)
+                        mes['code'] = "200"
+                        mes['msg'] = "注册成功"
+                        mes['user_id'] = user[0]['id']
+                        mes['token'] = token
                 else:
-                    pwd = make_password(pwd,None, 'pbkdf2_sha256')
-                    num = ninthnum()
-                    Users.objects.create(tep=tep,
-                                         password=pwd,
-                                         mmh=num,
-                                         name=tep).save()
-                    user = Users.objects.filter(mmh=num).values('id')
-                    mes['code'] = "200"
-                    mes['data'] = "注册成功"
-                    mes['user_id'] = user[0]['id']
+                    return Response(sa)
             else:
                 mes['code'] = "1"
-                mes['data'] = "不能为空"
+                mes['msg'] = "不能为空"
+            
         except:
-            mes['code'] = 0
+            mes['code'] = '0'
             mes['msg'] = '服务异常'
         return Response(mes)
 
@@ -207,10 +244,10 @@ class Upwd(APIView):
                 Users.objects.filter(id=uid).update(
                     password=make_password(pwd,None, 'pbkdf2_sha256'))
                 mes['code'] = "200"
-                mes['data'] = "修改成功"
+                mes['msg'] = "修改成功"
             else:
                 mes['code'] = "1"
-                mes['data'] = "密码不一致"
+                mes['msg'] = "密码不一致"
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -238,7 +275,7 @@ class Address_list(APIView):
                 mes['data'] = Address_serializer.data
             else:
                 mes['code'] = 1
-                mes['data'] = "用户id?"
+                mes['msg'] = "用户id?"
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -308,13 +345,13 @@ class Add_move(APIView):
                                        details=ccontent,
                                        t_id=t_id).save()
                 mes['code'] = 200
-                mes['data'] = "添加成功"
+                mes['msg'] = "添加成功"
             except:
                 mes['code'] = 0
                 mes['msg'] = '服务异常'
         else:
             mes['code'] = 1
-            mes['data'] = "有未填参数"
+            mes['msg'] = "有未填参数"
         return Response(mes)
 
 
@@ -380,13 +417,13 @@ class Add_moves(APIView):
                                      name=tep).save()
 
                 mes['code'] = 200
-                mes['data'] = "添加成功"
+                mes['msg'] = "添加成功"
             except:
                 mes['code'] = 0
                 mes['msg'] = '服务异常'
         else:
             mes['code'] = 1
-            mes['data'] = "有未填参数"
+            mes['msg'] = "有未填参数"
         return Response(mes)
 
 
@@ -413,14 +450,14 @@ class Examines(APIView):
                         e_list.append(
                             Examine.objects.filter(id=i).values("name"))
                     mes['code'] = 1
-                    mes['data'] = "审核未通过"
-                    mes['datas'] = e_list
+                    mes['msg'] = "审核未通过"
+                    mes['data'] = e_list
                 elif status[0]['status'] == 1:
                     mes['code'] = 200
-                    mes['data'] = "通过审核"
+                    mes['msg'] = "通过审核"
                 else:
                     mes['code'] = 2
-                    mes['data'] = "审核中"
+                    mes['msg'] = "审核中"
 
             elif int(type) == 1:
                 status = Move_intos.objects.filter(id=id).values("status")
@@ -432,14 +469,14 @@ class Examines(APIView):
                         e_list.append(
                             Examine.objects.filter(id=i).values("name"))
                     mes['code'] = 1
-                    mes['data'] = "审核未通过"
-                    mes['datas'] = e_list
+                    mes['msg'] = "审核未通过"
+                    mes['data'] = e_list
                 elif status[0]['status'] == 1:
                     mes['code'] = 200
-                    mes['data'] = "通过审核"
+                    mes['msg'] = "通过审核"
                 else:
                     mes['code'] = 2
-                    mes['data'] = "审核中"
+                    mes['msg'] = "审核中"
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -574,7 +611,7 @@ class Qfeedbackcreate(APIView):
         try:
             Qfeedback.objects.create(tep=tep, details=name).save()
             mes['code'] = 200
-            mes['data'] = "添加成功"
+            mes['msg'] = "添加成功"
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -656,7 +693,7 @@ class Search_takedelete(APIView):
             try:
                 Search_take_notes.objects.filter(uid=uid, id=sid).delete()
                 mes['code'] = 200
-                mes['data'] = "删除成功"
+                mes['msg'] = "删除成功"
             except:
                 mes['code'] = 0
                 mes['msg'] = '服务异常'
@@ -664,7 +701,7 @@ class Search_takedelete(APIView):
             try:
                 Search_take_notes.objects.filter(uid=uid).delete()
                 mes['code'] = 200
-                mes['data'] = "清空成功"
+                mes['msg'] = "清空成功"
             except:
                 mes['code'] = 0
                 mes['msg'] = '服务异常'
@@ -793,7 +830,7 @@ class Users_address_delete(APIView):
         try:
             Users_address.objects.filter(id=aid).delete()
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 1
             mes['msg'] = '服务异常'
@@ -816,7 +853,7 @@ class Users_address_type(APIView):
                                          user_id=user_id).update(type=0)
             Users_address.objects.filter(id=aid).update(type=1)
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 1
             mes['msg'] = '服务异常'
@@ -838,7 +875,7 @@ class User_utep(APIView):
         try:
             Users.objects.filter(_id=user_id).update(tep=tep)
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 1
             mes['msg'] = '服务异常'
@@ -864,6 +901,7 @@ class Goods_info(APIView):
                 goods_datas = tags(goods_ser.data)
                 mes['code'] = 200
                 mes['data'] = goods_datas
+                mes['msg'] = '服务异常'
             except:
                 mes['code'] = 1
                 mes['msg'] = '服务异常'
@@ -1409,7 +1447,7 @@ class Goods_is_status(APIView):
         try:
             Goods.objects.filter(id=gid).update(status=status_value)
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 1
             mes['msg'] = '服务异常'
@@ -1426,7 +1464,7 @@ class Goods_delete(APIView):
         try:
             Goods.objects.filter(id=gid).update(is_del=1)
             mes['code'] = 200
-            mes['data'] = '删除成功'
+            mes['msg'] = '删除成功'
         except:
             mes['code'] = 1
             mes['msg'] = '服务异常'
@@ -1613,7 +1651,7 @@ class Goods_qa_delete(APIView):
         try:
             QA.objects.filter(id=qid).delete()
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -1659,7 +1697,7 @@ class Goods_attribute_add(APIView):
             if gad_ser.is_valid():
                 user_obj = gad_ser.save()
                 mes['code'] = 200
-                mes['data'] = 'OK'
+                mes['msg'] = '添加成功'
             else:
                 mes['code'] = 1
                 mes['msg'] = gad_ser.errors
@@ -1717,7 +1755,7 @@ class Goods_attribute_definition_delete(APIView):
             Goods_attribute_definition.objects.filter(id=tid).delete()
             Goods_attribute.objects.filter(tid=tid).delete()
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '删除成功'
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -1736,7 +1774,7 @@ class Goods_attribute_delete(APIView):
         try:
             Goods_attribute.objects.filter(id=tid).delete()
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -1782,7 +1820,7 @@ class Goods_norms_delete(APIView):
         try:
             Goods_norms.objects.filter(id=nid).delete()
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 0
             mes['msg'] = '服务异常'
@@ -1942,7 +1980,7 @@ class Catering_type_delete(APIView):
         try:
             Catering_type.objects.filter(cid=cid, id=tid).delete()
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 1
             mes['msg'] = '服务异常'
@@ -1987,7 +2025,7 @@ class Catering_goods_delete(APIView):
         try:
             Catering_goods.objects.filter(id=gid, cid=cid).update(is_del=1)
             mes['code'] = 200
-            mes['data'] = '成功'
+            mes['msg'] = '成功'
         except:
             mes['code'] = 1
             mes['msg'] = '服务异常'
