@@ -93,13 +93,27 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 # 线上数据库
+# DATABASES = {
+#    'default': {
+#           'ENGINE': 'django.db.backends.mysql', #数据库引擎
+#           'NAME': 'mama_kaifa_zgydg',                       #数据库名
+#           'USER': 'mama_kaifa_zgydg',                       #用户名
+#           'PASSWORD': 'SP2xfaTwfACEy4mK',                   #密码
+#           'HOST': '47.113.194.115',                           #数据库主机，默认为localhost
+#           'PORT': '',                           #数据库端口，MySQL默认为3306
+#           'OPTIONS': {
+#              'autocommit': True,
+#          }
+#     }
+# }
+
 DATABASES = {
    'default': {
           'ENGINE': 'django.db.backends.mysql', #数据库引擎
-          'NAME': 'mama_kaifa_zgydg',                       #数据库名
-          'USER': 'mama_kaifa_zgydg',                       #用户名
-          'PASSWORD': 'SP2xfaTwfACEy4mK',                   #密码
-          'HOST': '47.113.194.115',                           #数据库主机，默认为localhost
+          'NAME': 'mmdb',                       #数据库名
+          'USER': 'root',                       #用户名
+          'PASSWORD': '123456',                   #密码
+          'HOST': '',                           #数据库主机，默认为localhost
           'PORT': '',                           #数据库端口，MySQL默认为3306
           'OPTIONS': {
              'autocommit': True,
@@ -152,12 +166,9 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-
-# 短信账户注册：请通过该地址开通账户http://sms.ihuyi.com/register.html
-# 登录用户中心->验证码短信->产品总览->APIID
-APIID = "C01362267"
-# 登录用户中心->验证码短信->产品总览->APIKEY
-APIKEY = "fc638bf958f35e28994ebb99d2a5f45a"
+# 短信
+APIUSER = "18618327652"
+APIPASSWOED = "228d7f8b3679de569602cba7015d9810"
 
 # URL = "http://127.0.0.1:8000/"
 URL = "0.0.0.0:8000/"
