@@ -6,6 +6,8 @@ import time
 from .views import *
 import jwt
 import datetime
+import urllib
+import urllib.request
 
 def dfilter(*args):
     """搜索多条件构建"""
@@ -34,12 +36,48 @@ def send_sms(*args):
     conn.close()
     return response_str
 
+def send_sms1(*args):
+    """链接短信
+    text: 内容
+    mobile: 电话
+    """
+
+    statusStr = {
+        '0': '短信发送成功',
+        '-1': '参数不全',
+        '-2': '服务器空间不支持,请确认支持curl或者fsocket,联系您的空间商解决或者更换空间',
+        '30': '密码错误',
+        '40': '账号不存在',
+        '41': '余额不足',
+        '42': '账户已过期',
+        '43': 'IP地址限制',
+        '50': '内容含有敏感词'
+    }
+
+    smsapi = "http://api.smsbao.com/"
+    
+    # 短信平台账号
+    user = settings.APIUSER
+    # 短信平台密码
+    password = settings.APIPASSWOED
+
+    content,phone = args
+
+    data = urllib.parse.urlencode({'u': user, 'p': password, 'm': phone, 'c': content})
+
+    send_url = smsapi + 'sms?' + data
+
+    response = urllib.request.urlopen(send_url)
+
+    the_page = response.read().decode('utf-8')
+
+    print (statusStr[the_page])
+
 def sends(tep):
     """发短信"""
     str=sixnum(4)
     text="您的验证码是："+str+"。请不要把验证码泄露给其他人。"
-    ret=send_sms(text, tep).decode('utf-8')
-    ret=json.loads(ret)
+    ret=send_sms1(text, tep)
     return str
 
 def sixnum(num):
@@ -100,3 +138,11 @@ def tags(request_data):
             taglist.append('全新')
         request_data[i]['tags'] = taglist
     return request_data
+
+
+def splits(data):
+    if len(data) != 1:
+        data=data.split(',')
+    else:
+        data = [data]
+    return data

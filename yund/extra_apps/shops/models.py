@@ -12,39 +12,6 @@ class BaseModel(models.Model):
         
         abstract = True
 
-
-class Comment(BaseModel,models.Model):
-    """商品评价详情表"""
-    id = models.AutoField(primary_key=True)
-    g_id = models.IntegerField(default=0,verbose_name='商品id')
-    rank = models.IntegerField(default=0,verbose_name='评论星数')
-    comments = models.CharField(max_length=255,verbose_name='评论内容')
-    com_type_id = models.IntegerField(default=0,verbose_name='评论类别id')
-    com_users_id = models.IntegerField(default=0,verbose_name='评论用户id')
-    t_id = models.IntegerField(verbose_name='总分类id')
-    # type = models.IntegerField(verbose_name='0商品评论1服务评论')
-
-    class Meta: 
-        db_table = "comment"
-        verbose_name = "商品评价详情"
-        verbose_name_plural = "商品评价详情"
-
-
-
-
-
-class Comment_type(BaseModel,models.Model):
-    """商品评价分类表"""
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255,verbose_name='分类名称')
-    status = models.IntegerField(default=0,verbose_name='上架1下架0')
-    sort = models.IntegerField(default=0,verbose_name='排序')
-
-    class Meta: 
-        db_table = "comment_type"
-        verbose_name = "商品评价分类"
-        verbose_name_plural = "商品评价分类"
-
 class Goods(BaseModel,models.Model):
     """商品表"""
     id = models.AutoField(primary_key=True)
@@ -54,7 +21,7 @@ class Goods(BaseModel,models.Model):
     star = models.IntegerField(default=0,verbose_name='星')
     drill = models.IntegerField(default=0,verbose_name='钻')
     crown = models.IntegerField(default=0,verbose_name='冠')
-    price = models.DecimalField(max_digits=8, decimal_places=2,verbose_name='价格')
+    price = models.DecimalField(max_digits=8, decimal_places=2,verbose_name='价格',null=True, blank=True)
     color = models.CharField(max_length=255,verbose_name='颜色')
     size = models.CharField(max_length=255,verbose_name='尺寸')
     pic = models.CharField(max_length=255,verbose_name='图片',null=True, blank=True)
@@ -99,31 +66,7 @@ class Goods(BaseModel,models.Model):
         return dicts
 
 
-class Goods_comment_types(BaseModel,models.Model):
-    """商品评价分类关联表"""
-    id = models.AutoField(primary_key=True)
-    t_id = models.IntegerField(default=0,verbose_name='评价分类id')
-    g_id = models.IntegerField(default=0,verbose_name='商品id')
-    type_count = models.IntegerField(default=0,verbose_name='分类评价总数')
-    z_tid = models.IntegerField(default=0,verbose_name='总分类id')
 
-    class Meta: 
-        db_table = "goods_comment_types"
-        verbose_name = "商品评价分类关联"
-        verbose_name_plural = "商品评价分类关联"
-
-class QA(BaseModel,models.Model):
-    """商品问答表"""
-    id = models.AutoField(primary_key=True)
-    g_id = models.IntegerField(default=0,verbose_name='商品id',null=True, blank=True)
-    questions = models.CharField(max_length=255,verbose_name='问题')
-    answers = models.CharField(max_length=255,verbose_name='答案')
-    t_id = models.IntegerField(verbose_name='总分类id',null=True, blank=True,default=0)
-
-    class Meta: 
-        db_table = "qa"
-        verbose_name = "商品问答"
-        verbose_name_plural = "商品问答"
 
 class Goods_type(BaseModel,models.Model):
     """商品分类表"""
@@ -204,8 +147,8 @@ class Goods_order(BaseModel,models.Model):
     content = models.CharField(max_length=255,verbose_name="订单备注")
     price = models.DecimalField(max_digits=8, decimal_places=2,verbose_name='订单总价')
     status =  models.IntegerField(verbose_name="订单状态(0待付款1待发货2待收货3已完成4退款中5退款成功)")
-    pays = models.IntegerField(verbose_name="支付方式(0贡献值1微信支付)")
-    logostics_no = models.CharField(max_length=255,verbose_name="物流单号")
+    pays = models.IntegerField(verbose_name="支付方式(0贡献值1记账支付)",null=True, blank=True)
+    logostics_no = models.CharField(max_length=255,verbose_name="物流单号",null=True, blank=True)
 
     class Meta:
         db_table = "goods_order"

@@ -24,7 +24,7 @@ class GoodsSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(max_digits=8, decimal_places=2,required=False)
     color = serializers.CharField(required=False)
     size = serializers.CharField(required=False)
-    pic = serializers.ImageField(max_length=1000,required=False)
+    pic = serializers.CharField(required=False)
     pics = serializers.CharField(required=False)
     sales_volume = serializers.IntegerField(required=False)
     prices = serializers.DecimalField(max_digits=8, decimal_places=2,required=False)
@@ -308,7 +308,7 @@ class GoodsModelSerializer(serializers.ModelSerializer):
 class GoodsbfSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goods
-        fields = ('pic','name','price')
+        fields = ('pic','name','price','id')
 
 #分类评价数量
 class Goods_comment_typeseModelSerializer(serializers.ModelSerializer):
