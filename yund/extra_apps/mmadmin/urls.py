@@ -9,4 +9,6 @@ urlpatterns = [
     path('goodsinfo',Goodsinfo),
     path('cateringinfo',Cateringinfo),
     path('ishtmls',isHtmls),
+    # 以下由djl编写
+    path('serviceinfo',Serviceinfo),
 ]

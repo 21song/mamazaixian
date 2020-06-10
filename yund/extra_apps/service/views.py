@@ -7,9 +7,11 @@ from rest_framework.views import APIView
 
 from .models import Service as ModelService
 from .models import ServiceStaff as ModelServiceStaff
-from .utils.pic_upload import upload
+from .utils.pic_upload import upload,delete_img
 from home.models import Users as ModelUsers
-from .serializer import ServiceSerializer,ServiceSimpleSerializer,StaffSerializer
+from home.models import QA as ModelQA
+from home.models import Goods_comment_types, Comment_type, Comment
+from .serializer import *
 
 class Service(APIView):
 
@@ -19,7 +21,7 @@ class Service(APIView):
         需要参数：service_id
         """
         service_id = request.query_params.get('service_id')
-        service = ModelService.objects.filter(id=service_id,suspend_status=1).first()
+        service = ModelService.objects.filter(id=service_id,is_del=0).first()
         service_data = ServiceSerializer(service).data
 
         context = {
@@ -93,7 +95,7 @@ class ServiceManage(APIView):
         """
         user_id = request.query_params.get('user_id')
         status = request.query_params.get('status')
-        services = ModelService.objects.filter(user_id=user_id,status=status,suspend_status=1).all()
+        services = ModelService.objects.filter(user_id=user_id,status=status,is_del=0).all()
 
         services_data = ServiceSimpleSerializer(services,many=True).data
 
@@ -112,7 +114,7 @@ class ServiceManage(APIView):
         """
         service_id = request.data.get('service_id')
         status = request.data.get('status')
-        service = ModelService.objects.filter(id=service_id,suspend_status=1).first()
+        service = ModelService.objects.filter(id=service_id,is_del=0).first()
         service.status = status
         service.save()
         context = {
@@ -131,7 +133,7 @@ class ServiceManage(APIView):
         service_id = request.data.get('service_id')
         service = ModelService.objects.filter(id=service_id).first()
         service_title = service.title
-        service.suspend_status = 0  # 设置状态为停用
+        service.is_del = 1  # 设置状态为已删除
         service.save()
 
         context = {
@@ -230,14 +232,19 @@ class Picture(APIView):
         """
         img = request.FILES.get('img')
         url = upload(img)  # upload方法在utils.pic_upload写了
-        context = {"url": url}
+        context = {"img_url": url}
         return Response(context)
 
     def delete(self, request: Request):
         """
         删除图片
+        需要字段：img_url
         """
-        pass
+        img_url = request.data.get('img_url')
+        delete_img(img_url)
+        info = f"{img_url}已删除"
+        context = {"del_info": info}
+        return Response(context)
 
 
 class ServiceSearch(APIView):
@@ -255,46 +262,46 @@ class ServiceSearch(APIView):
             if order_by == 'star':
                 service = ModelService.objects.filter(
                     Q(title__contains=keyword) | Q(details__contains=keyword),
-                    suspend_status=1).order_by('-star')
+                    is_del=0).order_by('-star')
             elif order_by == 'drill':
                 service = ModelService.objects.filter(
                     Q(title__contains=keyword) | Q(details__contains=keyword),
-                    suspend_status=1).order_by('-drill')
+                    is_del=0).order_by('-drill')
             elif order_by == 'crown':
                 service = ModelService.objects.filter(
                     Q(title__contains=keyword) | Q(details__contains=keyword),
-                    suspend_status=1).order_by('-crown')
+                    is_del=0).order_by('-crown')
             elif order_by == 'sales_volume':
                 service = ModelService.objects.filter(
                     Q(title__contains=keyword) | Q(details__contains=keyword),
-                    suspend_status=1).order_by('-sales_volume')
+                    is_del=0).order_by('-sales_volume')
             elif order_by == 'price_des':
                 service = ModelService.objects.filter(
                     Q(title__contains=keyword) | Q(details__contains=keyword),
-                    suspend_status=1).order_by('-price')
+                    is_del=0).order_by('-price')
             elif order_by == 'price_asc':
                 service = ModelService.objects.filter(
                     Q(title__contains=keyword) | Q(details__contains=keyword),
-                    suspend_status=1).order_by('price')
+                    is_del=0).order_by('price')
             else:
                 service = ModelService.objects.filter(
                     Q(title__contains=keyword) | Q(details__contains=keyword),
-                    suspend_status=1).order_by('-id')
+                    is_del=0).order_by('-id')
         else:
             if order_by == 'star':
-                service = ModelService.objects.filter(suspend_status=1).order_by('-star')
+                service = ModelService.objects.filter(is_del=0).order_by('-star')
             elif order_by == 'drill':
-                service = ModelService.objects.filter(suspend_status=1).order_by('-drill')
+                service = ModelService.objects.filter(is_del=0).order_by('-drill')
             elif order_by == 'crown':
-                service = ModelService.objects.filter(suspend_status=1).order_by('-crown')
+                service = ModelService.objects.filter(is_del=0).order_by('-crown')
             elif order_by == 'sales_volume':
-                service = ModelService.objects.filter(suspend_status=1).order_by('-sales_volume')
+                service = ModelService.objects.filter(is_del=0).order_by('-sales_volume')
             elif order_by == 'price_des':
-                service = ModelService.objects.filter(suspend_status=1).order_by('-price')
+                service = ModelService.objects.filter(is_del=0).order_by('-price')
             elif order_by == 'price_asc':
-                service = ModelService.objects.filter(suspend_status=1).order_by('price')
+                service = ModelService.objects.filter(is_del=0).order_by('price')
             else:
-                service = ModelService.objects.filter(suspend_status=1).order_by('-id')
+                service = ModelService.objects.filter(is_del=0).order_by('-id')
 
         service_data = ServiceSimpleSerializer(service,many=True).data
         context = {
@@ -318,16 +325,90 @@ class ServiceSelect(APIView):
             for k, l in request_data.items():
                 q.add(Q(**{k: l[0]}), Q.AND)
             service = ModelService.objects.filter(
-                Q(title__contains=keyword) | Q(details__contains=keyword),q).order_by('-id')
+                Q(title__contains=keyword) | Q(details__contains=keyword),
+                q,is_del=0).order_by('-id')
         else:
             for k, l in request_data.items():
                 q.add(Q(**{k: l[0]}), Q.AND)
-            service = ModelService.objects.filter(q).order_by('-id')
+            service = ModelService.objects.filter(q,is_del=0).order_by('-id')
 
         service_data = ServiceSimpleSerializer(service, many=True).data
         context = {
             "msg": "搜索服务并筛选成功",
             "service": service_data
+        }
+        return Response(context)
+
+
+class QA(APIView):
+    def get(self,request:Request):
+        """
+        查看本服务的问答内容，可查看所有本服务的问答(不带参数qa_id)，也可以查看单条问答（带参数qa_id）
+        需要参数(二选一)：service_id，qa_id
+        """
+        service_id = request.query_params.get('service_id')
+        qa_id = request.query_params.get('qa_id')
+        if qa_id:
+            qa = ModelQA.objects.filter(id=qa_id).first()
+            if qa:
+                qa_data = QASerializer(qa).data
+            else:
+                qa_data = '没有相关qa'
+        elif service_id:
+            qa = ModelQA.objects.filter(g_id=service_id)
+            if qa:
+                qa_data = QASerializer(qa,many=True).data
+            else:
+                qa_data = '没有相关qa'
+
+        context = {
+            "msg": "查看服务的问答成功",
+            "qa": qa_data
+        }
+        return Response(context)
+
+    def post(self,request:Request):
+        """
+        添加或修改问答，添加问答(不带参数qa_id)，修改（带参数qa_id）
+        需要参数：service_id(必选)，qa_id(可选)、questions(必选)、answers(必选)
+        """
+        service_id = request.data.get('service_id')
+        qa_id = request.data.get('qa_id')
+        questions = request.data.get('questions')
+        answers = request.data.get('answers')
+        t_id = ModelService.objects.filter(id=service_id).first().t_id
+
+        if qa_id:
+            qa = ModelQA.objects.filter(id=qa_id).first()
+            qa.questions = questions
+            qa.answers = answers
+            qa.save()
+        else:
+            qa = ModelQA.objects.create(
+                g_id=service_id,
+                questions=questions,
+                answers=answers,
+                t_id=t_id
+            )
+        qa_data = QASerializer(qa).data
+        context = {
+            "msg": "添加或修改问答成功",
+            "qa": qa_data
+        }
+        return Response(context)
+
+    def delete(self,request:Request):
+        """
+        删除问答
+        需要参数：qa_id
+        """
+        qa_id = request.data.get('qa_id')
+        qa = ModelQA.objects.filter(id=qa_id).first()
+        qa_questions = qa.questions
+        qa.delete()
+        context = {
+            "msg": "删除问答成功",
+            "deleted qa": qa_questions
         }
         return Response(context)
 
@@ -338,13 +419,29 @@ class ServiceDetail(APIView):
         普通用户看到的服务详情页面
         需要参数：service_id
         """
+        # 服务信息
         service_id = request.query_params.get('service_id')
-        service = ModelService.objects.filter(id=service_id,suspend_status=1).first()
+        service = ModelService.objects.filter(id=service_id,is_del=0).first()
         service_data = ServiceSerializer(service).data
 
-        # 服务评价
-        # 用户问答
+        # 服务评价(评价分类数量)
+        # 在评价分类关联表中定位到相应服务
+        comment_type = Goods_comment_types.objects.filter(g_id=service_id)
+        comment_type_count = dict()
+        sum = 0
+        for ct in comment_type:
+            # 根据评价分类id到评价分类表中找到分类名称
+            name = Comment_type.objects.filter(id=ct.t_id).first().name
+            type_count = ct.type_count
+            comment_type_count[name] = type_count
+            sum += type_count
+        comment_type_count['sum'] = sum
 
+        # 用户问答
+        qa = ModelQA.objects.filter(g_id=service_id).last()
+        qa_data = QASerializer(qa).data
+
+        # 服务团队
         user_id = service.user_id
         staff = ModelServiceStaff.objects.filter(user_id=user_id).all()[:3]
         staff_data = StaffSerializer(staff, many=True).data
@@ -352,8 +449,55 @@ class ServiceDetail(APIView):
         context = {
             "msg": "查看服务成功",
             "service": service_data,
+            "comment_type_count":comment_type_count,
+            "qa":qa_data,
             "staff": staff_data,
         }
         return Response(context)
+
+
+class ServiceComment(APIView):
+    def get(self, request: Request):
+        """
+        查看某服务的所有评价
+        需要参数：service_id
+        """
+        service_id = request.query_params.get('service_id')
+        comment = Comment.objects.filter(g_id=service_id)
+        if not comment:
+            return Response('暂无评论')
+
+        # 计算综合星数overall_star
+        sum_star = 0
+        for c in comment:
+            sum_star += c.rank
+        overall_star = round(sum_star / len(comment))
+
+        # 服务评价(评价分类数量)comment_type_count
+        # 在评价分类关联表中定位到相应服务
+        comment_type = Goods_comment_types.objects.filter(g_id=service_id)
+        comment_type_count = dict()
+        sum = 0
+        for ct in comment_type:
+            # 根据评价分类id到评价分类表中找到分类名称
+            name = Comment_type.objects.filter(id=ct.t_id).first().name
+            type_count = ct.type_count
+            comment_type_count[name] = type_count
+            sum += type_count
+        comment_type_count['sum'] = sum
+
+        # 某服务的若干条评价
+        comment_data = CommentSerializer(comment,many=True).data
+
+        context = {
+            "msg": "查看服务的评价成功",
+            "service_id": service_id,
+            "overall_star":overall_star,
+            "comment_type_count":comment_type_count,
+            "comment_data": comment_data,
+        }
+        return Response(context)
+
+
 
 

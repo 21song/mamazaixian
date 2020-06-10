@@ -12,6 +12,8 @@ urlpatterns = [
     path('search/',views.ServiceSearch.as_view()),
     path('select/',views.ServiceSelect.as_view()),
     path('detail/',views.ServiceDetail.as_view()),
+    path('qa/',views.QA.as_view()),
+    path('comment/',views.ServiceComment.as_view()),
 ]
 
 

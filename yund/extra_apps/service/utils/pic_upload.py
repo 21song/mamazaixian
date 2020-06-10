@@ -1,10 +1,10 @@
-from qiniu import Auth, put_file, etag, urlsafe_base64_encode, put_data
+from qiniu import Auth, put_file, etag, urlsafe_base64_encode, put_data,BucketManager
 import uuid
 from PIL import Image
 import io
 
 
-def upload(img):
+def upload(img):   # img是文件
     _img = img.read()
     size = len(_img) / (1024 * 1024)#上传图片的大小 M单位
     print('size:',size)
@@ -36,3 +36,18 @@ def upload(img):
 # with open("4971.jpg", "rb") as imageFile:
 #     url = upload(imageFile)
 #     print(url)
+
+def delete_img(img_url):  # img_url形如：http://qiniu.banluyuan.com/beb4fd86a56011eab5536014b35d1592.JPEG
+    access_key = 'Ka5DV-q4fp9V-kV31vb7KekwD3A6WjV_sWuJGB7W'
+    secret_key = 'Ta-n9rWOf6-trUe7iX4WouOY4Gmb0h6M1BTciBbf'
+    # 初始化Auth状态
+    q = Auth(access_key, secret_key)
+    # 初始化BucketManager
+    bucket = BucketManager(q)
+    # 你要测试的空间， 并且这个key在你空间中存在
+    bucket_name = 'banluyuan'
+    key = img_url.split('/')[-1]
+    # 删除bucket_name 中的文件 key
+    ret, info = bucket.delete(bucket_name, key)
+    # print(info)
+    return str(info)

@@ -1,7 +1,11 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from shops.models import *
 from shops.serializers import *
 # Create your views here.
+
+from service.models import Service as ModelService
+from service.serializer import ServiceSimpleSerializer
 
 def Login(request):
     if request.method == "POST":
@@ -26,6 +30,12 @@ def Cateringinfo(request):
     c_ser=Catering_goodsModelSerializers(c_data,many=True)
     return render(request, 'admins/catering-info.html',{'data':c_ser.data})
 
+
+# 本小段由djl编写
+def Serviceinfo(request):
+    service = ModelService.objects.all()
+    s_ser = ServiceSimpleSerializer(service, many=True)
+    return render(request, 'admins/service-info.html', {'data': s_ser.data})
 
 
 """

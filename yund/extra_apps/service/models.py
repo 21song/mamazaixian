@@ -21,7 +21,8 @@ class Service(models.Model):
     details = models.CharField(max_length=255, verbose_name='服务详情')
     status = models.IntegerField(verbose_name='上架1or下架0',default=1)   #是否上架(1上架；0下架)
     t_id = models.IntegerField(verbose_name='功能模块分类ID',default=2)  # 2就是服务；1是商品
-    suspend_status = models.IntegerField(verbose_name='正常1or停用0',default=1)   # 正常1，假删0
+    # suspend_status = models.IntegerField(verbose_name='正常1or停用0',default=1)   # 正常1，假删0
+    is_del = models.IntegerField(default=0, verbose_name='0未删除1已删除')
 
     class Meta:
         db_table = "Service"

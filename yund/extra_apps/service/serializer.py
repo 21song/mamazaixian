@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Service, ServiceStaff
+from home.models import QA,Comment
+from home.models import Users
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -15,6 +17,7 @@ class ServiceSimpleSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "price",
+            "cost",
             "pics",
             "star",
             "drill",
@@ -55,3 +58,24 @@ class StaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceStaff
         fields = "__all__"
+
+
+class QASerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QA
+        fields = "__all__"
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("id","g_id","rank","comments","com_users_id")
+
+    # 对 序列化后的结果进行「自定义过滤」
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        com_users_id = ret.pop('com_users_id')
+        com_user = Users.objects.filter(id=com_users_id).first()
+        ret['com_user_name'] = com_user.name
+        ret['com_user_pic'] = com_user.pic
+        return ret
