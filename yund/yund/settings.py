@@ -93,33 +93,33 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 # 线上数据库
-# DATABASES = {
-#    'default': {
-#           'ENGINE': 'django.db.backends.mysql', #数据库引擎
-#           'NAME': 'mama_kaifa_zgydg',                       #数据库名
-#           'USER': 'mama_kaifa_zgydg',                       #用户名
-#           'PASSWORD': 'SP2xfaTwfACEy4mK',                   #密码
-#           'HOST': '47.113.194.115',                           #数据库主机，默认为localhost
-#           'PORT': '',                           #数据库端口，MySQL默认为3306
-#           'OPTIONS': {
-#              'autocommit': True,
-#          }
-#     }
-# }
-
 DATABASES = {
    'default': {
           'ENGINE': 'django.db.backends.mysql', #数据库引擎
-          'NAME': 'mmdb',                       #数据库名
-          'USER': 'root',                       #用户名
-          'PASSWORD': '123456',                   #密码
-          'HOST': '',                           #数据库主机，默认为localhost
+          'NAME': 'mama_kaifa_zgydg',                       #数据库名
+          'USER': 'mama_kaifa_zgydg',                       #用户名
+          'PASSWORD': 'SP2xfaTwfACEy4mK',                   #密码
+          'HOST': '47.113.194.115',                           #数据库主机，默认为localhost
           'PORT': '',                           #数据库端口，MySQL默认为3306
           'OPTIONS': {
              'autocommit': True,
          }
     }
 }
+
+# DATABASES = {
+#    'default': {
+#           'ENGINE': 'django.db.backends.mysql', #数据库引擎
+#           'NAME': 'mmdb',                       #数据库名
+#           'USER': 'root',                       #用户名
+#           'PASSWORD': '123456',                   #密码
+#           'HOST': '',                           #数据库主机，默认为localhost
+#           'PORT': '',                           #数据库端口，MySQL默认为3306
+#           'OPTIONS': {
+#              'autocommit': True,
+#          }
+#     }
+# }
 
 
 # Password validation
