@@ -246,3 +246,65 @@ class Assemble_type(BaseModel,models.Model):
         db_table = "assemble_type"
         verbose_name = "总分类"
         verbose_name_plural = "总分类"
+
+
+
+class QA(BaseModel,models.Model):
+    """问答表"""
+    id = models.AutoField(primary_key=True)
+    g_id = models.IntegerField(default=0,verbose_name='商品id',null=True, blank=True)
+    questions = models.CharField(max_length=255,verbose_name='问题')
+    answers = models.CharField(max_length=255,verbose_name='答案')
+    t_id = models.IntegerField(verbose_name='总分类id',null=True, blank=True,default=0)
+
+    class Meta: 
+        db_table = "qa"
+        verbose_name = "问答"
+        verbose_name_plural = "问答"
+
+
+class Comment(BaseModel,models.Model):
+    """评价详情表"""    
+    id = models.AutoField(primary_key=True)
+    g_id = models.IntegerField(default=0,verbose_name='商品id')
+    rank = models.IntegerField(default=0,verbose_name='评论星数')
+    comments = models.CharField(max_length=255,verbose_name='评论内容')
+    com_type_id = models.IntegerField(default=0,verbose_name='评论类别id')
+    com_users_id = models.IntegerField(default=0,verbose_name='评论用户id')
+    t_id = models.IntegerField(verbose_name='总分类id')
+
+    class Meta: 
+        db_table = "comment"
+        verbose_name = "评价详情"
+        verbose_name_plural = "评价详情"
+
+
+
+
+
+class Comment_type(BaseModel,models.Model):
+    """评价分类表"""
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255,verbose_name='分类名称')
+    status = models.IntegerField(default=0,verbose_name='上架1下架0')
+    sort = models.IntegerField(default=0,verbose_name='排序')
+
+    class Meta: 
+        db_table = "comment_type"
+        verbose_name = "评价分类"
+        verbose_name_plural = "评价分类"
+
+
+class Goods_comment_types(BaseModel,models.Model):
+    """评价分类关联表"""
+    id = models.AutoField(primary_key=True)
+    t_id = models.IntegerField(default=0,verbose_name='评价分类id')
+    g_id = models.IntegerField(default=0,verbose_name='商品id')
+    type_count = models.IntegerField(default=0,verbose_name='分类评价总数')
+    z_tid = models.IntegerField(default=0,verbose_name='总分类id')
+
+    class Meta: 
+        db_table = "goods_comment_types"
+        verbose_name = "评价分类关联"
+        verbose_name_plural = "评价分类关联"
+
