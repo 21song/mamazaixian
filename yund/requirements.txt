@@ -12,5 +12,5 @@ django-haystack==2.8.1
 mysqlclient==1.4.4
 coreapi==2.3.3
 AgentLogin==3.0.0
-Pillow==5.4.1
+Pillow==8.2.0
 pyJWT==1.7.1
